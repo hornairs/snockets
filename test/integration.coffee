@@ -61,6 +61,13 @@ testSuite =
       test.deepEqual chain, ['sybling/sybling.js']
       test.done()
 
+  'require works for redundant includes': (test) ->
+    snockets.scan 'alphabet.coffee', (err) ->
+      throw err if err
+      chain = snockets.depGraph.getChain('alphabet.coffee')
+      test.deepEqual chain, ['x.coffee', 'y.js', 'z.coffee']
+      test.done()
+
   'require_tree works for nested directories': (test) ->
     snockets.scan 'fellowship.js', (err) ->
       throw err if err
