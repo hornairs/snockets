@@ -210,15 +210,14 @@ module.exports = class Snockets
   # Update the whole cache from disk:
   setCacheFile: (filepath) ->
     @cacheFile = @absPath(filePath)
-    fs.readFile @cacheFile, (err, data) =>
-      return callback err if err
-      try
-        caches = JSON.parse(data.toString('utf8'))
-        @cache = caches.cache
-        @concatCache = caches.concatCache
-      catch err
-        callback(err)
-      callback()
+    return if !fs.existsFileSync(@cacheFile)
+    data = fs.readFileSync @cacheFile
+    try
+      caches = JSON.parse(data.toString('utf8'))
+      @cache = caches.cache
+      @concatCache = caches.concatCache
+    catch err
+      console.log err
 
   # Write the whole cache to disk:
   saveCacheFile: (callback) ->
