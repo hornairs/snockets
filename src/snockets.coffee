@@ -54,7 +54,7 @@ module.exports = class Snockets
         o
 
       @saveCacheFile (err) ->
-        callback? err, result, concatenationChanged
+        callback? err, compiledChain, graphChanged
       compiledChain
 
   getConcatenation: (filePath, flags, callback) ->
@@ -221,9 +221,9 @@ module.exports = class Snockets
       callback()
 
   # Write the whole cache to disk:
-  saveCacheFile: ->
-    return unless @cacheFile?
-    fs.writeFile @cacheFile, JSON.stringify(cache: @cache, concatCache: @concatCache), callback
+  saveCacheFile: (callback) ->
+    return callback(null) unless @cacheFile?
+    fs.writeFile @cacheFile, JSON.stringify(cache: @cache, concatCache: @concatCache), (err) -> callback(err)
 
   # Reads a file's data and timestamp into the cache.
   readFile: (filePath, flags, callback) ->
