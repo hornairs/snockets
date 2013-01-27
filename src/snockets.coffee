@@ -53,7 +53,8 @@ module.exports = class Snockets
         o.js = @cache[link].js.toString 'utf8'
         o
 
-      callback? null, compiledChain, graphChanged
+      @saveCacheFile (err) ->
+        callback? err, result, concatenationChanged
       compiledChain
 
   getConcatenation: (filePath, flags, callback) ->
@@ -90,7 +91,8 @@ module.exports = class Snockets
       else
         result = concatenation
 
-      callback? null, result, concatenationChanged
+      @saveCacheFile (err) ->
+        callback? err, result, concatenationChanged
       result
 
   # ## Internal methods
@@ -204,6 +206,24 @@ module.exports = class Snockets
         callback null, stats
       catch e
         callback e
+
+  # Update the whole cache from disk:
+  setCacheFile: (filepath) ->
+    @cacheFile = @absPath(filePath)
+    fs.readFile @cacheFile, (err, data) =>
+      return callback err if err
+      try
+        caches = JSON.parse(data.toString('utf8'))
+        @cache = caches.cache
+        @concatCache = caches.concatCache
+      catch err
+        callback(err)
+      callback()
+
+  # Write the whole cache to disk:
+  saveCacheFile: ->
+    return unless @cacheFile?
+    fs.writeFile @cacheFile, JSON.stringify(cache: @cache, concatCache: @concatCache), callback
 
   # Reads a file's data and timestamp into the cache.
   readFile: (filePath, flags, callback) ->
